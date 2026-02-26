@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 from starlette.requests import Request
 
 load_dotenv()
@@ -67,7 +67,7 @@ def extract_predictions(result) -> list:
         return []
 
     item = result[0] if isinstance(result, list) else result
-    print("Workflow raw output:", item)  # logged server-side for debugging
+    print("Workflow output keys:", list(item.keys()))
 
     # Common output key names Roboflow workflows use
     for key in ("predictions", "output", "detections", "results"):
@@ -95,13 +95,12 @@ async def predict(file: UploadFile = File(...)):
     contents = await file.read()
 
     try:
-        image = Image.open(io.BytesIO(contents)).convert("RGB")
+        image = ImageOps.exif_transpose(Image.open(io.BytesIO(contents))).convert("RGB")
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid image file")
 
-    suffix = os.path.splitext(file.filename or "image.jpg")[1] or ".jpg"
-    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-        tmp.write(contents)
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
+        image.save(tmp, format="JPEG", quality=95)
         tmp_path = tmp.name
 
     try:
