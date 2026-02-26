@@ -21,8 +21,8 @@ DEMO_DIR = os.path.join(os.path.dirname(__file__), "public", "demo_images")
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 
 app = FastAPI()
-app.mount("/public", StaticFiles(directory="public"), name="public")
-templates = Jinja2Templates(directory="templates")
+app.mount("/public", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "public")), name="public")
+templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "templates"))
 
 
 def get_client():
