@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pill Counter</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: #94a3b8;
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 1rem;
+      padding: 1.75rem;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      border: 1px solid #475569;
+      border-radius: 0.5rem;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: #38bdf8;
+      border-color: #38bdf8;
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Upload */
+    .drop-zone {
+      border: 2px dashed #475569;
+      border-radius: 0.75rem;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      position: relative;
+    }
+
+    .drop-zone:hover, .drop-zone.dragover { border-color: #38bdf8; }
+
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .drop-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .drop-text { color: #94a3b8; font-size: 0.9rem; }
+    .drop-text span { color: #38bdf8; }
+
+    /* Camera */
+    #camera-section { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    video {
+      width: 100%;
+      border-radius: 0.75rem;
+      background: #0f172a;
+      max-height: 300px;
+      object-fit: cover;
+    }
+
+    .btn-row { display: flex; gap: 0.75rem; }
+
+    /* Preview */
+    #preview-wrap { margin-top: 1rem; display: none; }
+
+    #preview-wrap img {
+      width: 100%;
+      border-radius: 0.75rem;
+      border: 1px solid #334155;
+    }
+
+    /* Buttons */
+    button {
+      padding: 0.65rem 1.25rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-primary { background: #38bdf8; color: #0f172a; }
+    .btn-secondary { background: #334155; color: #e2e8f0; }
+    .btn-danger { background: #f43f5e; color: #fff; }
+
+    #submit-btn {
+      width: 100%;
+      margin-top: 1.25rem;
+      padding: 0.85rem;
+      font-size: 1rem;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      color: #0f172a;
+    }
+
+    /* Spinner */
+    .spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #0f172a33;
+      border-top-color: #0f172a;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Result */
+    #result { margin-top: 2rem; display: none; }
+
+    .count-badge {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .count-number {
+      font-size: 5rem;
+      font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .count-label {
+      color: #94a3b8;
+      font-size: 1rem;
+      margin-top: 0.25rem;
+    }
+
+    #annotated-img {
+      width: 100%;
+      border-radius: 0.75rem;
+      border: 1px solid #334155;
+      margin-top: 0.5rem;
+    }
+
+    .error-box {
+      background: #7f1d1d;
+      border: 1px solid #f43f5e;
+      border-radius: 0.5rem;
+      padding: 0.75rem 1rem;
+      color: #fca5a5;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pill Counter</h1>
+  <p class="subtitle">Made by Charbel Tabet</p>
+
+  <div class="card">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="upload">Upload Photo</button>
+      <button class="tab-btn" data-tab="camera">Take Photo</button>
+    </div>
+
+    <!-- Upload Tab -->
+    <div class="tab-panel active" id="tab-upload">
+      <div class="drop-zone" id="drop-zone">
+        <input type="file" id="file-input" accept="image/*" />
+        <div class="drop-icon">📁</div>
+        <div class="drop-text">Drag & drop or <span>browse</span></div>
+        <div class="drop-text" style="margin-top:0.25rem">PNG, JPG, WEBP</div>
+      </div>
+      <div id="preview-wrap">
+        <img id="upload-preview" src="" alt="Preview" />
+      </div>
+    </div>
+
+    <!-- Camera Tab -->
+    <div class="tab-panel" id="tab-camera">
+      <div id="camera-section">
+        <video id="video" autoplay playsinline muted></video>
+        <div class="btn-row">
+          <button class="btn-primary" id="start-camera-btn">Start Camera</button>
+          <button class="btn-secondary" id="snapshot-btn" disabled>Capture</button>
+          <button class="btn-danger" id="stop-camera-btn" disabled>Stop</button>
+        </div>
+        <canvas id="snapshot-canvas" style="display:none"></canvas>
+        <div id="snapshot-preview-wrap" style="display:none; margin-top:0.5rem">
+          <img id="snapshot-preview" style="width:100%;border-radius:0.75rem;border:1px solid #334155" />
+        </div>
+      </div>
+    </div>
+
+    <button id="submit-btn" disabled>
+      <span id="btn-label">Count Pills</span>
+      <div class="spinner" id="spinner"></div>
+    </button>
+
+    <div class="error-box" id="error-box"></div>
+  </div>
+
+  <!-- Result -->
+  <div class="card" id="result">
+    <div class="count-badge">
+      <div class="count-number" id="count-number">0</div>
+      <div class="count-label" id="count-label">pills detected</div>
+    </div>
+    <img id="annotated-img" src="" alt="Annotated result" />
+  </div>
+
+  <script>
+    // --- Tab switching ---
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+    let activeTab = 'upload';
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeTab = btn.dataset.tab;
+        tabBtns.forEach(b => b.classList.toggle('active', b === btn));
+        tabPanels.forEach(p => p.classList.toggle('active', p.id === `tab-${activeTab}`));
+        stopCamera();
+        resetState();
+      });
+    });
+
+    // --- Upload tab ---
+    const fileInput = document.getElementById('file-input');
+    const dropZone = document.getElementById('drop-zone');
+    const uploadPreview = document.getElementById('upload-preview');
+    const previewWrap = document.getElementById('preview-wrap');
+    let uploadedFile = null;
+
+    fileInput.addEventListener('change', () => {
+      const f = fileInput.files[0];
+      if (f) setUploadFile(f);
+    });
+
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const f = e.dataTransfer.files[0];
+      if (f && f.type.startsWith('image/')) setUploadFile(f);
+    });
+
+    function setUploadFile(f) {
+      uploadedFile = f;
+      uploadPreview.src = URL.createObjectURL(f);
+      previewWrap.style.display = 'block';
+      submitBtn.disabled = false;
+      hideError();
+    }
+
+    // --- Camera tab ---
+    const video = document.getElementById('video');
+    const startBtn = document.getElementById('start-camera-btn');
+    const snapBtn = document.getElementById('snapshot-btn');
+    const stopBtn = document.getElementById('stop-camera-btn');
+    const canvas = document.getElementById('snapshot-canvas');
+    const snapPreview = document.getElementById('snapshot-preview');
+    const snapPreviewWrap = document.getElementById('snapshot-preview-wrap');
+    let stream = null;
+    let capturedBlob = null;
+
+    startBtn.addEventListener('click', async () => {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+        video.srcObject = stream;
+        startBtn.disabled = true;
+        snapBtn.disabled = false;
+        stopBtn.disabled = false;
+      } catch (e) {
+        showError('Camera access denied: ' + e.message);
+      }
+    });
+
+    snapBtn.addEventListener('click', () => {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      canvas.toBlob(blob => {
+        capturedBlob = blob;
+        snapPreview.src = URL.createObjectURL(blob);
+        snapPreviewWrap.style.display = 'block';
+        submitBtn.disabled = false;
+        hideError();
+      }, 'image/jpeg', 0.92);
+    });
+
+    stopBtn.addEventListener('click', stopCamera);
+
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+        video.srcObject = null;
+        startBtn.disabled = false;
+        snapBtn.disabled = true;
+        stopBtn.disabled = true;
+      }
+    }
+
+    // --- Submit ---
+    const submitBtn = document.getElementById('submit-btn');
+    const btnLabel = document.getElementById('btn-label');
+    const spinner = document.getElementById('spinner');
+    const resultSection = document.getElementById('result');
+    const countNumber = document.getElementById('count-number');
+    const countLabel = document.getElementById('count-label');
+    const annotatedImg = document.getElementById('annotated-img');
+    const errorBox = document.getElementById('error-box');
+
+    submitBtn.addEventListener('click', async () => {
+      const imageFile = activeTab === 'upload' ? uploadedFile : capturedBlob;
+      if (!imageFile) return;
+
+      setLoading(true);
+      hideError();
+      resultSection.style.display = 'none';
+
+      const formData = new FormData();
+      formData.append('file', imageFile, activeTab === 'camera' ? 'capture.jpg' : imageFile.name);
+
+      try {
+        const resp = await fetch('/predict', { method: 'POST', body: formData });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          showError(data.detail || 'Prediction failed');
+          return;
+        }
+
+        countNumber.textContent = data.count;
+        countLabel.textContent = data.count === 1 ? 'pill detected' : 'pills detected';
+        annotatedImg.src = data.annotated_image;
+        resultSection.style.display = 'block';
+        resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (e) {
+        showError('Network error: ' + e.message);
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    function setLoading(on) {
+      submitBtn.disabled = on;
+      btnLabel.style.display = on ? 'none' : 'inline';
+      spinner.style.display = on ? 'block' : 'none';
+    }
+
+    function showError(msg) {
+      errorBox.textContent = msg;
+      errorBox.style.display = 'block';
+    }
+
+    function hideError() {
+      errorBox.style.display = 'none';
+    }
+
+    function resetState() {
+      uploadedFile = null;
+      capturedBlob = null;
+      previewWrap.style.display = 'none';
+      snapPreviewWrap.style.display = 'none';
+      submitBtn.disabled = true;
+      resultSection.style.display = 'none';
+      hideError();
+    }
+  </script>
+</body>
+</html>
