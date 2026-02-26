@@ -18,7 +18,6 @@
       --accent:    #3b82f6;
       --accent-2:  #6366f1;
       --danger:    #ef4444;
-      --success:   #22c55e;
       --radius:    10px;
       --radius-lg: 16px;
     }
@@ -36,10 +35,7 @@
     }
 
     /* ── Header ── */
-    header {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
+    header { text-align: center; margin-bottom: 2rem; }
 
     .logo-mark {
       display: inline-flex;
@@ -58,79 +54,99 @@
       font-size: 1.5rem;
       font-weight: 700;
       letter-spacing: -0.02em;
-      color: var(--text);
     }
 
     .subtitle {
       color: var(--text-muted);
       font-size: 0.85rem;
       margin-top: 0.3rem;
-      letter-spacing: 0.01em;
     }
 
-    /* ── Card ── */
+    /* ── Main card ── */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: 1.5rem;
       width: 100%;
-      max-width: 560px;
+      max-width: 580px;
     }
 
-    /* ── Tabs ── */
-    .tabs {
-      display: flex;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 3px;
-      margin-bottom: 1.5rem;
-      gap: 3px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 7px;
-      background: transparent;
+    /* ── Section label ── */
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
       color: var(--text-muted);
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s;
-      letter-spacing: 0.01em;
+      margin-bottom: 0.65rem;
     }
 
-    .tab-btn.active {
-      background: var(--surface-2);
-      color: var(--text);
-      border: 1px solid var(--border-2);
+    /* ── Source row ── */
+    .source-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 1.25rem;
     }
 
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-
-    /* ── Drop zone ── */
-    .drop-zone {
+    /* ── Shared source tile ── */
+    /* Both tiles share the same base look: dashed border, centered content */
+    .source-tile {
       border: 1.5px dashed var(--border-2);
       border-radius: var(--radius);
-      padding: 2rem 1.5rem;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
-      position: relative;
       background: var(--bg);
+      min-height: 120px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s, background 0.15s;
+      cursor: pointer;
     }
 
-    .drop-zone:hover,
-    .drop-zone.dragover {
+    .source-tile:hover { border-color: var(--accent); background: rgba(59,130,246,0.04); }
+
+    /* Active (has content) state */
+    .source-tile.active {
+      border-style: solid;
       border-color: var(--accent);
-      background: rgba(59,130,246,0.04);
     }
 
-    .drop-zone input[type="file"] {
+    .source-tile.active:hover { background: var(--bg); }
+
+    /* Icon + label shown in idle state */
+    .tile-idle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      pointer-events: none;
+    }
+
+    .tile-idle svg {
+      width: 28px;
+      height: 28px;
+      stroke: var(--text-muted);
+      opacity: 0.5;
+    }
+
+    .tile-idle span {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .tile-idle small {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: -0.3rem;
+    }
+
+    /* Hidden file input overlay */
+    .tile-file-input {
       position: absolute;
       inset: 0;
       opacity: 0;
@@ -139,106 +155,162 @@
       height: 100%;
     }
 
-    .drop-icon {
-      width: 36px;
-      height: 36px;
-      margin: 0 auto 0.75rem;
-      opacity: 0.5;
-    }
-
-    .drop-icon svg { width: 36px; height: 36px; stroke: var(--text-muted); }
-
-    .drop-title {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--text);
-    }
-
-    .drop-hint {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-top: 0.3rem;
-    }
-
-    .drop-hint span { color: var(--accent); }
-
-    /* ── Preview (upload tab) ── */
-    #preview-wrap {
-      margin-top: 1rem;
+    /* Preview image that fills the tile */
+    .tile-preview {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
       display: none;
-      border-radius: var(--radius);
-      overflow: hidden;
-      border: 1px solid var(--border);
     }
 
-    #preview-wrap img {
+    .source-tile.active .tile-preview { display: block; }
+    .source-tile.active .tile-idle    { display: none; }
+
+    /* ── Camera-specific overlay controls ── */
+    /* Live video */
+    .tile-video {
+      position: absolute;
+      inset: 0;
       width: 100%;
-      display: block;
-      max-height: 260px;
+      height: 100%;
       object-fit: cover;
-    }
-
-    /* ── Camera ── */
-    #camera-section { display: flex; flex-direction: column; gap: 0.75rem; }
-
-    video {
-      width: 100%;
-      border-radius: var(--radius);
-      background: var(--bg);
-      max-height: 280px;
-      object-fit: cover;
-      border: 1px solid var(--border);
-      display: block;
-    }
-
-    .btn-row { display: flex; gap: 0.5rem; }
-
-    #snapshot-preview-wrap {
       display: none;
-      border-radius: var(--radius);
-      overflow: hidden;
-      border: 1px solid var(--border);
     }
 
-    #snapshot-preview {
-      width: 100%;
-      display: block;
-      max-height: 240px;
-      object-fit: cover;
-    }
+    .source-tile.camera-live .tile-video  { display: block; }
+    .source-tile.camera-live .tile-idle   { display: none; }
 
-    /* ── Buttons ── */
-    button {
-      padding: 0.55rem 1rem;
-      border: 1px solid transparent;
-      border-radius: var(--radius);
-      font-size: 0.85rem;
-      font-weight: 500;
+    /* Capture button shown over the live feed */
+    .capture-btn {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(4px);
       cursor: pointer;
-      transition: opacity 0.15s, background 0.15s;
-      letter-spacing: 0.01em;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
     }
 
-    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .capture-btn:hover { background: rgba(255,255,255,0.3); }
+    .capture-btn::after {
+      content: '';
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+    }
 
-    .btn-primary {
-      background: var(--accent);
+    .source-tile.camera-live .capture-btn { display: flex; }
+
+    /* Retake button shown after capture */
+    .retake-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 3px 8px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      background: rgba(0,0,0,0.55);
       color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 6px;
+      cursor: pointer;
+      display: none;
+      backdrop-filter: blur(4px);
+      letter-spacing: 0.02em;
+    }
+
+    .source-tile.active .retake-btn { display: block; }
+
+    /* ── Inset divider ── */
+    .inset-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.25rem 0;
+    }
+
+    /* ── Demo grid ── */
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    @media (max-width: 400px) {
+      .demo-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .demo-thumb {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      background: var(--bg);
+      position: relative;
+      transition: border-color 0.15s;
+    }
+
+    .demo-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: opacity 0.15s;
+    }
+
+    .demo-thumb:hover            { border-color: var(--border-2); }
+    .demo-thumb:hover img        { opacity: 0.85; }
+
+    .demo-thumb.selected {
       border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.22);
     }
 
-    .btn-secondary {
-      background: var(--surface-2);
-      color: var(--text);
-      border-color: var(--border-2);
+    .demo-thumb.selected::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(59,130,246,0.1);
+      pointer-events: none;
     }
 
-    .btn-danger {
-      background: transparent;
-      color: var(--danger);
-      border-color: rgba(239,68,68,0.3);
+    .check-mark {
+      display: none;
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 18px;
+      height: 18px;
+      background: var(--accent);
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
     }
 
+    .demo-thumb.selected .check-mark { display: flex; }
+    .check-mark svg { width: 10px; height: 10px; stroke: #fff; stroke-width: 2.5; fill: none; }
+
+    .demo-empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      padding: 1.5rem 0;
+    }
+
+    /* ── Submit button ── */
     #submit-btn {
       width: 100%;
       margin-top: 1.25rem;
@@ -247,22 +319,24 @@
       font-weight: 600;
       background: var(--accent);
       color: #fff;
-      border-color: var(--accent);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      border-radius: var(--radius);
+      transition: background 0.15s;
     }
 
     #submit-btn:hover:not(:disabled) { background: #2563eb; }
+    #submit-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-    /* ── Spinner ── */
     .spinner {
       display: none;
       width: 16px;
       height: 16px;
-      border: 2px solid rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.25);
       border-top-color: #fff;
       border-radius: 50%;
       animation: spin 0.65s linear infinite;
@@ -282,38 +356,25 @@
       display: none;
     }
 
-    /* ── Divider ── */
-    .divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 2rem 0;
-    }
-
     /* ── Result ── */
-    #result { display: none; width: 100%; max-width: 560px; }
+    #result { display: none; width: 100%; max-width: 580px; margin-top: 1.5rem; }
 
     .result-header {
       display: flex;
       align-items: center;
       gap: 1.25rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .count-block {
-      display: flex;
-      flex-direction: column;
+      margin-bottom: 1.25rem;
     }
 
     .count-number {
-      font-size: 3.5rem;
+      font-size: 3.25rem;
       font-weight: 800;
       line-height: 1;
       letter-spacing: -0.04em;
-      color: var(--text);
     }
 
     .count-label {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-muted);
       margin-top: 0.2rem;
       text-transform: uppercase;
@@ -323,102 +384,57 @@
 
     .count-divider {
       width: 1px;
-      height: 48px;
+      height: 44px;
       background: var(--border);
       flex-shrink: 0;
     }
 
-    .result-meta {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      line-height: 1.6;
+    .result-meta { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; }
+    .result-meta strong { color: var(--text); font-weight: 500; }
+
+    .annotated-wrap {
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      margin-bottom: 1.25rem;
     }
 
-    .result-meta strong {
-      color: var(--text);
-      font-weight: 500;
-    }
+    #annotated-img { width: 100%; display: block; }
 
     /* ── Pill strip ── */
-    .section-label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-      margin-bottom: 0.65rem;
-    }
-
     .pill-strip-wrap {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: thin;
       scrollbar-color: var(--border-2) transparent;
-      margin-bottom: 1.5rem;
       padding-bottom: 4px;
     }
 
-    .pill-strip-wrap::-webkit-scrollbar {
-      height: 4px;
-    }
+    .pill-strip-wrap::-webkit-scrollbar       { height: 4px; }
+    .pill-strip-wrap::-webkit-scrollbar-track  { background: transparent; }
+    .pill-strip-wrap::-webkit-scrollbar-thumb  { background: var(--border-2); border-radius: 2px; }
 
-    .pill-strip-wrap::-webkit-scrollbar-track {
-      background: transparent;
-    }
+    .pill-strip { display: flex; gap: 8px; width: max-content; }
 
-    .pill-strip-wrap::-webkit-scrollbar-thumb {
-      background: var(--border-2);
-      border-radius: 2px;
-    }
+    .pill-thumb { flex-shrink: 0; }
 
-    .pill-strip {
-      display: flex;
-      gap: 8px;
-      width: max-content;
-    }
-
-    .pill-thumb {
+    .pill-thumb-img-wrap {
       width: 72px;
       height: 72px;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid var(--border);
       background: var(--bg);
-      flex-shrink: 0;
-      position: relative;
     }
 
-    .pill-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+    .pill-thumb-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    .pill-thumb .pill-idx {
-      position: absolute;
-      bottom: 3px;
-      right: 4px;
-      font-size: 9px;
-      font-weight: 700;
-      color: rgba(255,255,255,0.75);
-      background: rgba(0,0,0,0.5);
-      border-radius: 3px;
-      padding: 1px 3px;
-      line-height: 1.4;
-      letter-spacing: 0.03em;
-    }
-
-    /* ── Annotated image ── */
-    .annotated-wrap {
-      border-radius: var(--radius);
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-
-    #annotated-img {
-      width: 100%;
-      display: block;
+    .pill-conf {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 4px;
     }
 
     canvas { display: none; }
@@ -438,44 +454,48 @@
   </header>
 
   <div class="card">
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="upload">Upload Image</button>
-      <button class="tab-btn" data-tab="camera">Camera</button>
-    </div>
+    <div class="section-label">Image source</div>
+    <div class="source-row">
 
-    <!-- Upload Tab -->
-    <div class="tab-panel active" id="tab-upload">
-      <div class="drop-zone" id="drop-zone">
-        <input type="file" id="file-input" accept="image/*" />
-        <div class="drop-icon">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Upload tile -->
+      <div class="source-tile" id="upload-tile">
+        <input type="file" class="tile-file-input" id="file-input" accept="image/*" />
+        <img class="tile-preview" id="upload-preview" alt="Upload preview" />
+        <button class="retake-btn" id="upload-retake">✕ Remove</button>
+        <div class="tile-idle">
+          <svg fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
             <path d="M3 15v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/>
             <polyline points="7 10 12 5 17 10"/>
             <line x1="12" y1="5" x2="12" y2="15"/>
           </svg>
+          <span>Upload</span>
+          <small>or drag &amp; drop</small>
         </div>
-        <div class="drop-title">Drop image here or <span style="color:var(--accent)">browse</span></div>
-        <div class="drop-hint">PNG, JPG, WEBP supported</div>
       </div>
-      <div id="preview-wrap">
-        <img id="upload-preview" src="" alt="Preview" />
+
+      <!-- Camera tile -->
+      <div class="source-tile" id="camera-tile">
+        <video id="video" autoplay playsinline muted class="tile-video"></video>
+        <button class="capture-btn" id="capture-btn" title="Capture"></button>
+        <img class="tile-preview" id="snapshot-preview" alt="Captured frame" />
+        <button class="retake-btn" id="camera-retake">↺ Retake</button>
+        <div class="tile-idle">
+          <svg fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          <span>Camera</span>
+          <small>tap to open</small>
+        </div>
       </div>
+
     </div>
 
-    <!-- Camera Tab -->
-    <div class="tab-panel" id="tab-camera">
-      <div id="camera-section">
-        <video id="video" autoplay playsinline muted></video>
-        <div class="btn-row">
-          <button class="btn-primary" id="start-camera-btn">Start Camera</button>
-          <button class="btn-secondary" id="snapshot-btn" disabled>Capture</button>
-          <button class="btn-danger" id="stop-camera-btn" disabled>Stop</button>
-        </div>
-        <canvas id="snapshot-canvas"></canvas>
-        <div id="snapshot-preview-wrap">
-          <img id="snapshot-preview" alt="Captured frame" />
-        </div>
-      </div>
+    <!-- Demo images -->
+    <hr class="inset-divider" />
+    <div class="section-label">Or choose a demo image</div>
+    <div class="demo-grid" id="demo-grid">
+      <div class="demo-empty">Loading…</div>
     </div>
 
     <button id="submit-btn" disabled>
@@ -486,31 +506,24 @@
     <div class="error-box" id="error-box"></div>
   </div>
 
-  <!-- Hidden canvas for cropping pills -->
-  <canvas id="crop-canvas" style="display:none"></canvas>
-
   <!-- Result -->
   <div id="result">
-    <hr class="divider" />
-
     <div class="card">
       <div class="result-header">
-        <div class="count-block">
+        <div>
           <div class="count-number" id="count-number">0</div>
-          <div class="count-label" id="count-label">Pills detected</div>
+          <div class="count-label" id="count-label">pills detected</div>
         </div>
         <div class="count-divider"></div>
         <div class="result-meta" id="result-meta"></div>
       </div>
 
-      <!-- Annotated image -->
       <div class="section-label">Annotated image</div>
       <div class="annotated-wrap">
         <img id="annotated-img" src="" alt="Annotated result" />
       </div>
 
-      <!-- Pill thumbnails strip -->
-      <div id="pill-strip-section" style="display:none; margin-top:1.25rem">
+      <div id="pill-strip-section" style="display:none">
         <div class="section-label">Detected pills</div>
         <div class="pill-strip-wrap">
           <div class="pill-strip" id="pill-strip"></div>
@@ -519,160 +532,253 @@
     </div>
   </div>
 
+  <canvas id="snap-canvas"></canvas>
+  <canvas id="crop-canvas"></canvas>
+
   <script>
-    // ── Tab switching ──────────────────────────────────────
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabPanels = document.querySelectorAll('.tab-panel');
-    let activeTab = 'upload';
+    // ── State ───────────────────────────────────────────────
+    let activeSource = null; // 'upload' | 'camera' | 'demo'
+    let uploadedFile = null;
+    let capturedBlob = null;
+    let demoBlob     = null;
+    let stream       = null;
 
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        activeTab = btn.dataset.tab;
-        tabBtns.forEach(b => b.classList.toggle('active', b === btn));
-        tabPanels.forEach(p => p.classList.toggle('active', p.id === `tab-${activeTab}`));
-        stopCamera();
-        resetState();
-      });
-    });
-
-    // ── Upload tab ─────────────────────────────────────────
-    const fileInput    = document.getElementById('file-input');
-    const dropZone     = document.getElementById('drop-zone');
+    // ── Upload tile ─────────────────────────────────────────
+    const uploadTile    = document.getElementById('upload-tile');
+    const fileInput     = document.getElementById('file-input');
     const uploadPreview = document.getElementById('upload-preview');
-    const previewWrap  = document.getElementById('preview-wrap');
-    let uploadedFile   = null;
+    const uploadRetake  = document.getElementById('upload-retake');
 
     fileInput.addEventListener('change', () => {
-      if (fileInput.files[0]) setUploadFile(fileInput.files[0]);
+      if (fileInput.files[0]) applyUpload(fileInput.files[0]);
     });
 
-    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-    dropZone.addEventListener('drop', e => {
+    uploadTile.addEventListener('dragover', e => { e.preventDefault(); uploadTile.classList.add('dragover'); });
+    uploadTile.addEventListener('dragleave', () => uploadTile.classList.remove('dragover'));
+    uploadTile.addEventListener('drop', e => {
       e.preventDefault();
-      dropZone.classList.remove('dragover');
+      uploadTile.classList.remove('dragover');
       const f = e.dataTransfer.files[0];
-      if (f && f.type.startsWith('image/')) setUploadFile(f);
+      if (f && f.type.startsWith('image/')) applyUpload(f);
     });
 
-    function setUploadFile(f) {
+    uploadRetake.addEventListener('click', e => {
+      e.stopPropagation();
+      clearUpload();
+      clearSubmit();
+    });
+
+    function applyUpload(f) {
+      clearCamera();
+      clearDemo();
       uploadedFile = f;
       uploadPreview.src = URL.createObjectURL(f);
-      previewWrap.style.display = 'block';
-      submitBtn.disabled = false;
-      hideError();
+      uploadTile.classList.add('active');
+      setActiveSource('upload');
     }
 
-    // ── Camera tab ─────────────────────────────────────────
-    const video       = document.getElementById('video');
-    const startBtn    = document.getElementById('start-camera-btn');
-    const snapBtn     = document.getElementById('snapshot-btn');
-    const stopBtn     = document.getElementById('stop-camera-btn');
-    const canvas      = document.getElementById('snapshot-canvas');
-    const snapPreview = document.getElementById('snapshot-preview');
-    const snapWrap    = document.getElementById('snapshot-preview-wrap');
-    let stream        = null;
-    let capturedBlob  = null;
+    function clearUpload() {
+      uploadedFile = null;
+      uploadPreview.src = '';
+      fileInput.value = '';
+      uploadTile.classList.remove('active');
+    }
 
-    startBtn.addEventListener('click', async () => {
+    // ── Camera tile ─────────────────────────────────────────
+    const cameraTile    = document.getElementById('camera-tile');
+    const video         = document.getElementById('video');
+    const captureBtn    = document.getElementById('capture-btn');
+    const snapPreview   = document.getElementById('snapshot-preview');
+    const cameraRetake  = document.getElementById('camera-retake');
+    const snapCanvas    = document.getElementById('snap-canvas');
+
+    // Clicking the idle tile (not the buttons) starts the camera
+    cameraTile.addEventListener('click', e => {
+      if (e.target === cameraRetake || e.target === captureBtn) return;
+      if (cameraTile.classList.contains('camera-live')) return;
+      if (cameraTile.classList.contains('active')) return;
+      startCamera();
+    });
+
+    captureBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      doCapture();
+    });
+
+    cameraRetake.addEventListener('click', e => {
+      e.stopPropagation();
+      clearCapture();
+      startCamera(); // go back to live
+    });
+
+    async function startCamera() {
+      clearUpload();
+      clearDemo();
       try {
         stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
         video.srcObject = stream;
-        startBtn.disabled = true;
-        snapBtn.disabled  = false;
-        stopBtn.disabled  = false;
-      } catch (e) {
-        showError('Camera access denied: ' + e.message);
+        cameraTile.classList.add('camera-live');
+        cameraTile.classList.remove('active');
+      } catch (err) {
+        showError('Camera access denied: ' + err.message);
       }
-    });
+    }
 
-    snapBtn.addEventListener('click', () => {
-      canvas.width  = video.videoWidth;
-      canvas.height = video.videoHeight;
-      canvas.getContext('2d').drawImage(video, 0, 0);
-      canvas.toBlob(blob => {
+    function doCapture() {
+      snapCanvas.width  = video.videoWidth;
+      snapCanvas.height = video.videoHeight;
+      snapCanvas.getContext('2d').drawImage(video, 0, 0);
+      snapCanvas.toBlob(blob => {
         capturedBlob = blob;
         snapPreview.src = URL.createObjectURL(blob);
-        snapWrap.style.display = 'block';
-        submitBtn.disabled = false;
-        hideError();
+        stopStream();
+        cameraTile.classList.remove('camera-live');
+        cameraTile.classList.add('active');
+        setActiveSource('camera');
       }, 'image/jpeg', 0.92);
-    });
+    }
 
-    stopBtn.addEventListener('click', stopCamera);
-
-    function stopCamera() {
+    function stopStream() {
       if (stream) {
         stream.getTracks().forEach(t => t.stop());
         stream = null;
         video.srcObject = null;
-        startBtn.disabled = false;
-        snapBtn.disabled  = true;
-        stopBtn.disabled  = true;
       }
     }
 
-    // ── Submit ─────────────────────────────────────────────
-    const submitBtn   = document.getElementById('submit-btn');
-    const btnLabel    = document.getElementById('btn-label');
-    const spinner     = document.getElementById('spinner');
-    const resultSec   = document.getElementById('result');
-    const countNumber = document.getElementById('count-number');
-    const countLabel  = document.getElementById('count-label');
-    const resultMeta  = document.getElementById('result-meta');
+    function clearCapture() {
+      capturedBlob = null;
+      snapPreview.src = '';
+      cameraTile.classList.remove('active', 'camera-live');
+      stopStream();
+    }
+
+    function clearCamera() {
+      clearCapture();
+    }
+
+    // ── Demo images ─────────────────────────────────────────
+    const demoGrid = document.getElementById('demo-grid');
+
+    async function loadDemoImages() {
+      try {
+        const resp = await fetch('/demo-images');
+        const data = await resp.json();
+        demoGrid.innerHTML = '';
+        if (!data.images || data.images.length === 0) {
+          demoGrid.innerHTML = '<div class="demo-empty">No demo images — add files to <code>public/demo_images/</code></div>';
+          return;
+        }
+        data.images.forEach(url => {
+          const wrap  = document.createElement('div');
+          wrap.className = 'demo-thumb';
+
+          const img   = document.createElement('img');
+          img.src     = url;
+          img.alt     = url.split('/').pop();
+          img.loading = 'lazy';
+
+          const check = document.createElement('div');
+          check.className = 'check-mark';
+          check.innerHTML = `<svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>`;
+
+          wrap.appendChild(img);
+          wrap.appendChild(check);
+          wrap.addEventListener('click', () => selectDemo(url, wrap));
+          demoGrid.appendChild(wrap);
+        });
+      } catch {
+        demoGrid.innerHTML = '<div class="demo-empty">Failed to load demo images.</div>';
+      }
+    }
+
+    async function selectDemo(url, thumbEl) {
+      clearUpload();
+      clearCamera();
+      clearDemoSelection();
+      thumbEl.classList.add('selected');
+      try {
+        demoBlob = await fetch(url).then(r => r.blob());
+        setActiveSource('demo');
+      } catch {
+        showError('Failed to load demo image.');
+      }
+    }
+
+    function clearDemoSelection() {
+      demoBlob = null;
+      demoGrid.querySelectorAll('.demo-thumb.selected').forEach(t => t.classList.remove('selected'));
+    }
+
+    function clearDemo() { clearDemoSelection(); }
+
+    // ── Submit ──────────────────────────────────────────────
+    const submitBtn    = document.getElementById('submit-btn');
+    const btnLabel     = document.getElementById('btn-label');
+    const spinner      = document.getElementById('spinner');
+    const resultSec    = document.getElementById('result');
+    const countNumber  = document.getElementById('count-number');
+    const countLabel   = document.getElementById('count-label');
+    const resultMeta   = document.getElementById('result-meta');
     const annotatedImg = document.getElementById('annotated-img');
-    const errorBox    = document.getElementById('error-box');
-    const pillStrip   = document.getElementById('pill-strip');
+    const errorBox     = document.getElementById('error-box');
+    const pillStrip    = document.getElementById('pill-strip');
     const pillStripSec = document.getElementById('pill-strip-section');
-    const cropCanvas  = document.getElementById('crop-canvas');
+    const cropCanvas   = document.getElementById('crop-canvas');
+
+    function setActiveSource(src) {
+      activeSource = src;
+      submitBtn.disabled = false;
+      hideError();
+    }
+
+    function clearSubmit() {
+      activeSource = null;
+      submitBtn.disabled = true;
+    }
 
     submitBtn.addEventListener('click', async () => {
-      const imageFile = activeTab === 'upload' ? uploadedFile : capturedBlob;
+      const imageFile = activeSource === 'upload' ? uploadedFile
+                      : activeSource === 'camera' ? capturedBlob
+                      : demoBlob;
       if (!imageFile) return;
 
       setLoading(true);
       hideError();
       resultSec.style.display = 'none';
 
-      const formData = new FormData();
-      formData.append('file', imageFile, activeTab === 'camera' ? 'capture.jpg' : imageFile.name);
+      const filename = activeSource === 'camera' ? 'capture.jpg'
+                     : activeSource === 'demo'   ? 'demo.jpg'
+                     : imageFile.name;
+      const fd = new FormData();
+      fd.append('file', imageFile, filename);
 
       try {
-        const resp = await fetch('/predict', { method: 'POST', body: formData });
+        const resp = await fetch('/predict', { method: 'POST', body: fd });
         const data = await resp.json();
-
-        if (!resp.ok) {
-          showError(data.detail || 'Prediction failed');
-          return;
-        }
+        if (!resp.ok) { showError(data.detail || 'Prediction failed'); return; }
 
         const count = data.count;
         countNumber.textContent = count;
         countLabel.textContent  = count === 1 ? 'pill detected' : 'pills detected';
         annotatedImg.src = data.annotated_image;
 
-        // Meta info
         const preds = data.predictions || [];
         if (preds.length > 0) {
-          const avgConf = preds.reduce((s, p) => s + (p.confidence || 0), 0) / preds.length;
-          resultMeta.innerHTML = `<strong>${count}</strong> object${count !== 1 ? 's' : ''} found<br>avg. confidence <strong>${(avgConf * 100).toFixed(0)}%</strong>`;
+          const avg = preds.reduce((s, p) => s + (p.confidence || 0), 0) / preds.length;
+          resultMeta.innerHTML = `<strong>${count}</strong> object${count !== 1 ? 's' : ''} found<br>avg. confidence <strong>${(avg * 100).toFixed(0)}%</strong>`;
         } else {
-          resultMeta.innerHTML = `No pills detected in this image.`;
+          resultMeta.innerHTML = 'No pills detected in this image.';
         }
 
-        // Crop pill thumbnails
         renderPillStrip(imageFile, preds);
 
         resultSec.style.display = 'block';
-        // Scroll after the annotated image has loaded so the layout is stable
         annotatedImg.onload = () => {
           resultSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
           annotatedImg.onload = null;
         };
-        // Fallback: if already cached / instantly decoded, fire manually
-        if (annotatedImg.complete) {
-          resultSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        if (annotatedImg.complete) resultSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
       } catch (e) {
         showError('Network error: ' + e.message);
       } finally {
@@ -680,86 +786,65 @@
       }
     });
 
-    // ── Pill strip ─────────────────────────────────────────
+    // ── Pill strip ──────────────────────────────────────────
     function renderPillStrip(imageFile, predictions) {
       pillStrip.innerHTML = '';
-
       if (!predictions || predictions.length === 0) {
         pillStripSec.style.display = 'none';
         return;
       }
-
       const img = new Image();
       img.onload = () => {
         predictions.forEach((pred, i) => {
-          const x = pred.x || 0;
-          const y = pred.y || 0;
-          const w = pred.width  || 0;
-          const h = pred.height || 0;
-
-          // Add padding around each pill
-          const pad = Math.max(w, h) * 0.2;
-          const sx  = Math.max(0, x - w / 2 - pad);
-          const sy  = Math.max(0, y - h / 2 - pad);
-          const sw  = Math.min(img.width  - sx, w + pad * 2);
-          const sh  = Math.min(img.height - sy, h + pad * 2);
+          const x    = pred.x || 0, y = pred.y || 0;
+          const w    = pred.width || 0, h = pred.height || 0;
+          const conf = pred.confidence || 0;
+          const pad  = Math.max(w, h) * 0.2;
+          const sx   = Math.max(0, x - w / 2 - pad);
+          const sy   = Math.max(0, y - h / 2 - pad);
+          const sw   = Math.min(img.width  - sx, w + pad * 2);
+          const sh   = Math.min(img.height - sy, h + pad * 2);
 
           cropCanvas.width  = sw;
           cropCanvas.height = sh;
-          const ctx = cropCanvas.getContext('2d');
-          ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+          cropCanvas.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
 
-          const dataUrl = cropCanvas.toDataURL('image/jpeg', 0.85);
-
-          const thumb = document.createElement('div');
+          const thumb   = document.createElement('div');
           thumb.className = 'pill-thumb';
 
-          const thumbImg = document.createElement('img');
-          thumbImg.src = dataUrl;
-          thumbImg.alt = `Pill ${i + 1}`;
+          const wrap    = document.createElement('div');
+          wrap.className = 'pill-thumb-img-wrap';
 
-          const idx = document.createElement('div');
-          idx.className = 'pill-idx';
-          idx.textContent = i + 1;
+          const ti      = document.createElement('img');
+          ti.src        = cropCanvas.toDataURL('image/jpeg', 0.85);
+          ti.alt        = `Pill ${i + 1}`;
 
-          thumb.appendChild(thumbImg);
-          thumb.appendChild(idx);
+          const confEl  = document.createElement('div');
+          confEl.className = 'pill-conf';
+          confEl.textContent = `${(conf * 100).toFixed(0)}%`;
+
+          wrap.appendChild(ti);
+          thumb.appendChild(wrap);
+          thumb.appendChild(confEl);
           pillStrip.appendChild(thumb);
         });
-
         pillStripSec.style.display = 'block';
       };
-
       img.src = URL.createObjectURL(imageFile);
     }
 
-    // ── Helpers ────────────────────────────────────────────
+    // ── Helpers ─────────────────────────────────────────────
     function setLoading(on) {
-      submitBtn.disabled = on;
+      submitBtn.disabled     = on;
       btnLabel.style.display = on ? 'none' : 'inline';
       spinner.style.display  = on ? 'block' : 'none';
     }
 
-    function showError(msg) {
-      errorBox.textContent    = msg;
-      errorBox.style.display  = 'block';
-    }
+    function showError(msg) { errorBox.textContent = msg; errorBox.style.display = 'block'; }
+    function hideError()    { errorBox.style.display = 'none'; }
 
-    function hideError() {
-      errorBox.style.display = 'none';
-    }
-
-    function resetState() {
-      uploadedFile  = null;
-      capturedBlob  = null;
-      previewWrap.style.display  = 'none';
-      snapWrap.style.display     = 'none';
-      submitBtn.disabled         = true;
-      resultSec.style.display    = 'none';
-      pillStrip.innerHTML        = '';
-      pillStripSec.style.display = 'none';
-      hideError();
-    }
+    // ── Init ─────────────────────────────────────────────────
+    loadDemoImages();
   </script>
 </body>
 </html>

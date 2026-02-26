@@ -6,6 +6,7 @@ import tempfile
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from starlette.requests import Request
@@ -16,7 +17,11 @@ ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY", "GLtJ5r9nHHA0DozQo21D")
 WORKSPACE_NAME = "charbels-workspace-dyeep"
 WORKFLOW_ID = "general-segmentation-api"
 
+DEMO_DIR = os.path.join(os.path.dirname(__file__), "public", "demo_images")
+ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+
 app = FastAPI()
+app.mount("/public", StaticFiles(directory="public"), name="public")
 templates = Jinja2Templates(directory="templates")
 
 
@@ -90,6 +95,17 @@ async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
+@app.get("/demo-images")
+async def demo_images():
+    if not os.path.isdir(DEMO_DIR):
+        return {"images": []}
+    files = sorted(
+        f for f in os.listdir(DEMO_DIR)
+        if os.path.splitext(f)[1].lower() in ALLOWED_EXTENSIONS
+    )
+    return {"images": [f"/public/demo_images/{f}" for f in files]}
+
+
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     contents = await file.read()
@@ -130,3 +146,9 @@ async def predict(file: UploadFile = File(...)):
         "annotated_image": f"data:image/jpeg;base64,{annotated_b64}",
         "predictions": predictions,
     }
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, port=8000)
+
