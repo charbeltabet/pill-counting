@@ -13,7 +13,7 @@ from starlette.requests import Request
 
 load_dotenv()
 
-ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY", "GLtJ5r9nHHA0DozQo21D")
+ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY")
 WORKSPACE_NAME = "charbels-workspace-dyeep"
 WORKFLOW_ID = "detect-count-and-visualize"
 
